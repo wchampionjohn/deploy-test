@@ -10,6 +10,9 @@ class User < ApplicationRecord
   has_secure_password
   has_many :sessions, dependent: :destroy
 
+  has_many :publishers_users, dependent: :destroy
+  has_many :publishers, through: :publishers_users
+
   # validations ...............................................................
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 
@@ -18,11 +21,16 @@ class User < ApplicationRecord
     kabob_user = fetch_kabob_user(access_token)
     return nil unless kabob_user
 
-    user = find_or_initialize_by(email_address: "#{kabob_user["mobile"]}@kabob.conector.io")
+    user = find_or_initialize_by(email_address: "#{kabob_user["id"]}@kabob.conector.io")
 
     if user.new_record?
       # random password
       user.password = SecureRandom.hex(10)
+      user.save!
+    end
+
+    if new_token = fetch_new_access_token(access_token)
+      user.kabob_access_token = new_token
       user.save!
     end
 
@@ -49,6 +57,29 @@ class User < ApplicationRecord
     end
   rescue StandardError => e
     Rails.logger.error "Kabob API request failed: #{e.message}"
+    nil
+  end
+
+  def self.fetch_new_access_token(access_token)
+    uri = URI("#{ENV['INTERNAL_KABOB_PLATFORM_URL']}/api/app/v1/users/new_access_token")
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = uri.scheme == "https"
+
+    req = Net::HTTP::Get.new(uri)
+    req["Authorization"] = "Bearer #{access_token}"
+    req["Content-Type"] = "application/json; charset=utf-8"
+
+    response = http.request(req)
+
+    if response.is_a?(Net::HTTPSuccess)
+      data = JSON.parse(response.body)
+      data["access_token"]
+    else
+      Rails.logger.error "Kabob new token API error: #{response.code} - #{response.body}"
+      nil
+    end
+  rescue StandardError => e
+    Rails.logger.error "Kabob new token API request failed: #{e.message}"
     nil
   end
 

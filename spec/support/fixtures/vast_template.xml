@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VAST version="3.0">
+  <Ad id="test-ad-1">
+    <InLine>
+      <AdSystem>Test Ad System</AdSystem>
+      <AdTitle>Test Video Ad</AdTitle>
+      <Impression>
+        <![CDATA[{{IMPRESSION_URL}}]]>
+      </Impression>
+      <Creatives>
+        <Creative id="test-creative-1">
+          <Linear>
+            <Duration>{{DURATION}}</Duration>
+            <MediaFiles>
+              <MediaFile delivery="progressive" type="video/mp4" width="{{WIDTH}}" height="{{HEIGHT}}">
+                <![CDATA[{{MEDIA_URL}}]]>
+              </MediaFile>
+            </MediaFiles>
+            <TrackingEvents>
+              <Tracking event="start">
+                <![CDATA[http://example.com/tracking/start]]>
+              </Tracking>
+              <Tracking event="complete">
+                <![CDATA[http://example.com/tracking/complete]]>
+              </Tracking>
+            </TrackingEvents>
+          </Linear>
+        </Creative>
+      </Creatives>
+    </InLine>
+  </Ad>
+</VAST>
