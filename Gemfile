@@ -16,10 +16,6 @@ gem "bcrypt", "~> 3.1.11"
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 
 # Use the database-backed adapters for Rails.cache, Active Job, and Action Cable
-gem "solid_cache"
-gem "solid_queue"
-gem "solid_cable"
-
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
 
@@ -35,6 +31,13 @@ gem "thruster", require: false
 gem "jwt"
 
 gem "dotenv-rails"
+
+# background jobs
+gem "redis", "5.3.0"
+gem "redis-namespace", "1.11.0"
+gem "sidekiq", "7.3.7"
+gem "sidekiq-scheduler", "5.0.6"
+gem "whenever", "1.0.0"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem

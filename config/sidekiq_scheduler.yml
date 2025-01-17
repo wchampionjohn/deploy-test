@@ -1,0 +1,12 @@
+# ** Sidekiq Scheduler
+# *  https://github.com/moove-it/sidekiq-scheduler#schedule-configuration
+# *
+# ** Cron Example
+# *  https://crontab.guru/examples.html
+
+a_test_job:
+  cron: '0 30 6 * * 1'
+  class: TestJob
+  queue: low
+  description: "測試用的 Job，未來會移除"
+  enabled: true

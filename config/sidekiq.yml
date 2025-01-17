@@ -1,0 +1,10 @@
+# https://github.com/mperham/sidekiq/wiki/Advanced-Options
+
+:concurrency: 10
+:timeout: 86400
+
+# 數字(權重)越大，越有機會先執行
+:queues:
+  - [ 'low', '1' ]
+  - [ 'default', '5' ]
+  - [ 'critical', '10' ]
