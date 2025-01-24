@@ -15,8 +15,8 @@ class OpenRtbBuilder
         tagid: @ad_request.ad_unit_id,
         secure: 1,
         banner: {
-          w: @ad_unit.size.split("x")[0],
-          h: @ad_unit.size.split("x")[1]
+          w: @ad_unit.size.split("x")[0].to_i,
+          h: @ad_unit.size.split("x")[1].to_i
         },
         bidfloor: get_floor_price,
         bidfloorcur: "USD",
@@ -30,7 +30,7 @@ class OpenRtbBuilder
     }.compact
   end
 
-  private
+private
 
   def get_floor_price
     @ad_unit.ad_space.floor_price
@@ -61,6 +61,18 @@ class OpenRtbBuilder
     }
   end
 
+  # {
+  #   "id": "com.example.fakeapp",
+  #   "name": "Fake App",
+  #   "bundle": "com.example.fakeapp.bundle",
+  #   "storeurl": "https://apps.example.com/fakeapp",
+  #   "cat": ["IAB1", "IAB2"],
+  #   "ver": "1.2.3",
+  #   "publisher": {
+  #     "id": "pub-123456",
+  #     "name": "Example Publisher"
+  #   }
+  # }
   def build_app_info
     {
       id: @ad_unit.ad_space.publisher.id,
@@ -68,6 +80,33 @@ class OpenRtbBuilder
     }
   end
 
+  # {
+  #   "id": "user-78910",
+  #   "buyeruid": "buyer-12345",
+  #   "gender": "M",
+  #   "yob": 1990,
+  #   "keywords": "sports,news,technology",
+  #   "geo": {
+  #     "lat": 25.034,
+  #     "lon": 121.5645
+  #   },
+  #   "data": [
+  #     {
+  #       "id": "segment-123",
+  #       "name": "Sports Enthusiasts",
+  #       "segment": [
+  #         {
+  #           "id": "seg-001",
+  #           "name": "Football"
+  #         },
+  #         {
+  #           "id": "seg-002",
+  #           "name": "Basketball"
+  #         }
+  #       ]
+  #     }
+  #   ]
+  # }
   def build_user_info
     {
       # id: @ad_request.device.user_id,
