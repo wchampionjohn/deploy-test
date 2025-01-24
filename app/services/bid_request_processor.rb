@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BidRequestProcessor
   def initialize(ad_request)
     @ad_request = ad_request

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # app/services/open_rtb_builder.rb
 class OpenRtbBuilder
   def initialize(ad_request)

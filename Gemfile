@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 source "https://rubygems.org"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
@@ -62,7 +64,6 @@ group :development do
 
   gem "annotaterb", "4.13.0"
   gem "rubocop", "1.68.0"
-
 end
 
 group :test do

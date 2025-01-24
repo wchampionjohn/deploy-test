@@ -1,4 +1,6 @@
-require 'ostruct'
+# frozen_string_literal: true
+
+require "ostruct"
 
 module DspResponseHelper
   def build_dsp_response(options = {})

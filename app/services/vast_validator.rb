@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # app/services/vast_validator.rb
 class VastValidator
   attr_reader :errors

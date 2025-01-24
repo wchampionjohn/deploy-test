@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # spec/factories/ad_units.rb
 # == Schema Information
 #
