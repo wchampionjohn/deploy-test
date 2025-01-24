@@ -1,3 +1,27 @@
+# == Schema Information
+#
+# Table name: deals
+#
+#  id                                              :bigint           not null, primary key
+#  currency(價格幣別)                              :string           default("USD")
+#  deal_type(Deal類型: preferred, private_auction) :string
+#  end_date(結束日期)                              :datetime
+#  is_active(Deal是否啟用)                         :boolean          default(TRUE)
+#  name(Deal名稱)                                  :string
+#  price(價格(CPM))                                :decimal(10, 4)
+#  priority(優先順序)                              :integer
+#  settings(Deal設定)                              :jsonb
+#  start_date(開始日期)                            :datetime
+#  uid(Deal唯一識別碼)                             :string
+#  created_at                                      :datetime         not null
+#  updated_at                                      :datetime         not null
+#  ad_space_id(廣告版位ID)                         :bigint
+#
+# Indexes
+#
+#  index_deals_on_ad_space_id  (ad_space_id)
+#  index_deals_on_uid          (uid) UNIQUE
+#
 require 'rails_helper'
 
 RSpec.describe Deal, type: :model do
