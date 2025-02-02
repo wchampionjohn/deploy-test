@@ -9,7 +9,10 @@ FactoryBot.define do
     is_active { true }
     floor_price { 100.00 }
     vast_enabled { true }
-    supported_formats { [ "video/mp4", "video/webm" ] }
+    supported_formats { [ "video/mp4", "video/webm", "image/jpeg", "image/png" ] }
     settings { { autoplay: true, loop: false } }
+    fps { 30 }
+    min_duration { 5 }
+    max_duration { 30 }
   end
 end

@@ -58,6 +58,44 @@ RSpec.describe "Api::V1::BidRequests", type: :request do
             headers: auth_headers
         }.to change(Impression, :count).by(1)
       end
+
+      it "processes a DOOH bid request successfully" do
+        # 設定 ad_space 的 venue_type，而不是改變 unit_type
+        ad_unit.ad_space.update!(venue_type: "airport")
+
+        # 模擬 DSP 回應
+        mock_dsp_request(build_dsp_response(price: 10.0))
+
+        post "/api/v1/bid_requests",
+          params: default_bid_request_params(
+            ad_unit_id: ad_unit.id,
+            device_id: device.id
+          ),
+          as: :json,
+          headers: auth_headers
+
+        expect(response).to have_http_status(:ok)
+        expect(AdRequest.last.bid_request).to include("dooh")
+        expect(AdRequest.last.bid_request["dooh"]["venuetype"]).to eq([ "airport" ])
+      end
+
+      it "processes bid request with display time successfully" do
+        display_time = Time.current.to_i
+        mock_dsp_request(build_dsp_response(price: 10.0))
+
+        post "/api/v1/bid_requests",
+          params: default_bid_request_params(
+            ad_unit_id: ad_unit.id,
+            device_id: device.id,
+            dt: display_time
+          ),
+          as: :json,
+          headers: auth_headers
+
+        expect(response).to have_http_status(:ok)
+        expect(AdRequest.last.estimated_display_time.to_i).to eq(display_time)
+        expect(AdRequest.last.bid_request["imp"].first["dt"]).to eq(display_time * 1000)  # 確認轉換為毫秒
+      end
     end
 
     context "with invalid parameters" do

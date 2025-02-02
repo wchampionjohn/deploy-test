@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_12_30_172824) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_02_095323) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -27,8 +27,20 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_30_172824) do
     t.string "error_message", comment: "錯誤信息"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "qty_multiplier", precision: 10, scale: 4, comment: "廣告單元底價倍率"
+    t.string "qty_source_type", comment: "廣告單元底價來源類型"
+    t.string "qty_vendor", comment: "廣告單元底價來源廠商"
+    t.jsonb "qty_ext", comment: "廣告單元底價來源額外資訊"
+    t.string "nurl", comment: "Notification URL"
+    t.string "burl", comment: "Bid URL"
+    t.string "notification_status", comment: "Notification 狀態"
+    t.datetime "notified_at", comment: "通知時間"
+    t.decimal "applied_multiplier", precision: 10, scale: 4, comment: "廣告單元底價倍率"
+    t.datetime "estimated_display_time", comment: "預估顯示時間"
     t.index ["ad_unit_id"], name: "index_ad_requests_on_ad_unit_id"
     t.index ["device_id"], name: "index_ad_requests_on_device_id"
+    t.index ["estimated_display_time"], name: "index_ad_requests_on_estimated_display_time"
+    t.index ["notification_status"], name: "index_ad_requests_on_notification_status"
     t.index ["uid"], name: "index_ad_requests_on_uid", unique: true
   end
 
@@ -45,7 +57,20 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_30_172824) do
     t.text "description", comment: "描述"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "venue_type", comment: "DOOH venue type (e.g., AIRPORT, MALL)"
+    t.string "venue_name", comment: "Name of the venue"
     t.index ["publisher_id", "name"], name: "index_ad_spaces_on_publisher_id_and_name", unique: true
+  end
+
+  create_table "ad_unit_time_multipliers", force: :cascade do |t|
+    t.bigint "ad_unit_id"
+    t.integer "day_of_week", comment: "星期幾"
+    t.time "start_time", comment: "開始時間"
+    t.time "end_time", comment: "結束時間"
+    t.decimal "multiplier", precision: 10, scale: 4
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ad_unit_id"], name: "index_ad_unit_time_multipliers_on_ad_unit_id"
   end
 
   create_table "ad_units", force: :cascade do |t|
@@ -61,6 +86,13 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_30_172824) do
     t.jsonb "settings", default: {}, comment: "其他設定"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "fps", comment: "Frames per second for DOOH displays"
+    t.integer "min_duration", comment: "Minimum duration in seconds"
+    t.integer "max_duration", comment: "Maximum duration in seconds"
+    t.decimal "qty_multiplier", precision: 10, scale: 4, comment: "廣告單元底價倍率"
+    t.integer "qty_source_type", default: 0, comment: "廣告單元底價來源類型"
+    t.string "qty_vendor", comment: "廣告單元底價來源廠商"
+    t.jsonb "qty_ext"
   end
 
   create_table "deal_buyers", force: :cascade do |t|

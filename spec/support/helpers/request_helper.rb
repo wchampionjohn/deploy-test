@@ -30,9 +30,13 @@ module RequestHelper
         ip: options[:ip] || "192.168.1.1",
         user_agent: options[:user_agent] || "Mozilla/5.0",
         timestamp: options[:timestamp] || Time.current.iso8601,
+        dt: options[:dt],  # 預計播放時間
         geo: options[:geo] || {
           lat: 25.0330,
-          lon: 121.5654
+          lon: 121.5654,
+          country: "TWN",
+          city: "Taipei",
+          zip: "100"
         }
       }
     }

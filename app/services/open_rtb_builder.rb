@@ -17,12 +17,15 @@ class OpenRtbBuilder
           h: @ad_unit.size.split("x")[1]
         },
         bidfloor: get_floor_price,
-        bidfloorcur: "USD"
+        bidfloorcur: "USD",
+        dt: @ad_request.estimated_display_time.to_i * 1000,  # 轉換為 Unix timestamp 毫秒
+        qty: build_qty_info
       } ],
       device: build_device_info,
       app: build_app_info,
-      user: build_user_info
-    }
+      user: build_user_info,
+      dooh: build_dooh_info
+    }.compact
   end
 
   private
@@ -68,5 +71,30 @@ class OpenRtbBuilder
       # id: @ad_request.device.user_id,
       # geo: build_device_info[:geo]
     }
+  end
+
+  def build_qty_info
+    {
+      multiplier: @ad_request.applied_multiplier,
+      sourcetype: @ad_unit.qty_source_type_value,
+      vendor: @ad_unit.qty_vendor,
+      ext: @ad_unit.qty_ext
+    }.compact  # 移除 nil 值
+  end
+
+  def build_dooh_info
+    return unless @ad_unit.ad_space.venue_type.present?
+
+    {
+      id: @ad_unit.screen&.uid,
+      name: @ad_unit.ad_space.name,
+      venuetype: [ @ad_unit.ad_space.venue_type ].compact,
+      venuetypetax: 1,  # Using OpenOOH Venue Taxonomy
+      publisher: {
+        id: @ad_unit.ad_space.publisher.id,
+        name: @ad_unit.ad_space.publisher.name,
+        domain: @ad_unit.ad_space.publisher.domain
+      }.compact
+    }.compact
   end
 end
