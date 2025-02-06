@@ -75,7 +75,7 @@ private
   # }
   def build_app_info
     {
-      id: @ad_unit.ad_space.publisher.id,
+      id: @ad_unit.ad_space.publisher.id.to_s,
       name: @ad_unit.ad_space.publisher.name
     }
   end
