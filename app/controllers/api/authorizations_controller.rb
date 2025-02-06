@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Api::AuthorizationsController < Api::BaseController
   allow_unauthenticated_access only: :show
 

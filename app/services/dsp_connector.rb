@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 class DspConnector
   def request(dsp_config, rtb_request)
-    case dsp_config.name
+    case dsp_config["name"]
     when "appier"
       request_appier(rtb_request)
     when "ttd"

@@ -1,3 +1,22 @@
+# frozen_string_literal: true
+
+# == Schema Information
+#
+# Table name: publishers_users
+#
+#  id           :bigint           not null, primary key
+#  is_active    :boolean          default(FALSE)
+#  permissions  :jsonb
+#  role         :string           not null
+#  created_at   :datetime         not null
+#  updated_at   :datetime         not null
+#  publisher_id :integer
+#  user_id      :integer
+#
+# Indexes
+#
+#  index_publishers_users_on_publisher_id_and_user_id  (publisher_id,user_id) UNIQUE
+#
 class PublishersUser < ApplicationRecord
   # extends ...................................................................
   # includes ..................................................................

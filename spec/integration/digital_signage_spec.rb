@@ -1,15 +1,17 @@
-# spec/integration/digital_signage_spec.rb
-require 'rails_helper'
+# frozen_string_literal: true
 
-RSpec.describe 'Digital Signage Integration', type: :model do
+# spec/integration/digital_signage_spec.rb
+require "rails_helper"
+
+RSpec.describe "Digital Signage Integration", type: :model do
   let(:publisher) { create(:publisher) }
   let(:device) { create(:device) }
   let(:screen) { create(:screen, device: device) }
   let(:ad_space) { create(:ad_space, publisher: publisher) }
   let(:ad_unit) { create(:ad_unit, screen: screen, ad_space: ad_space) }
 
-  describe 'complete digital signage workflow' do
-    it 'creates and manages digital signage components' do
+  describe "complete digital signage workflow" do
+    it "creates and manages digital signage components" do
       # Device and Screen relationship
       expect(device.screens).to include(screen)
       expect(screen.device).to eq(device)
@@ -19,16 +21,16 @@ RSpec.describe 'Digital Signage Integration', type: :model do
       expect(ad_unit.ad_space).to eq(ad_space)
 
       # Test status changes
-      screen.update(operational_status: 'maintenance')
-      expect(screen.operational_status).to eq('maintenance')
+      screen.update(operational_status: "maintenance")
+      expect(screen.operational_status).to eq("maintenance")
       expect(Screen.operational).not_to include(screen)
     end
   end
 
-  describe 'ad delivery workflow' do
+  describe "ad delivery workflow" do
     let(:ad_request) { create(:ad_request, ad_unit: ad_unit) }
 
-    it 'handles ad requests and impressions' do
+    it "handles ad requests and impressions" do
       expect(ad_request.ad_unit).to eq(ad_unit)
 
       impression = create(:impression,

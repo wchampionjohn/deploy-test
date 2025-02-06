@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BidRequestProcessor
   def initialize(ad_request)
     @ad_request = ad_request
@@ -19,7 +21,7 @@ class BidRequestProcessor
     winning_bid = select_winning_bid(responses)
 
     # 5. Handle response based on type
-    winning_bid.vast_url.present? ? handle_vast_response(winning_bid) : format_regular_response(winning_bid)
+    winning_bid["vast_url"].present? ? handle_vast_response(winning_bid) : format_regular_response(winning_bid)
   end
 
   private

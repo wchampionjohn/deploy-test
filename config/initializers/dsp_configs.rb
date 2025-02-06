@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # config/initializers/dsp_configs.rb
 DSP_CONFIGS = [
   {

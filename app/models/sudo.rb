@@ -1,3 +1,19 @@
+# frozen_string_literal: true
+
+# == Schema Information
+#
+# Table name: sudos
+#
+#  id              :bigint           not null, primary key
+#  email_address   :string           not null
+#  password_digest :string           not null
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#
+# Indexes
+#
+#  index_sudos_on_email_address  (email_address) UNIQUE
+#
 class Sudo < ApplicationRecord
   # extends ...................................................................
   # includes ..................................................................

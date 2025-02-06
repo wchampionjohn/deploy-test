@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RequestHelper
   def json_response
     JSON.parse(response.body, symbolize_names: true)
@@ -6,16 +8,16 @@ module RequestHelper
   def auth_headers(token = nil)
     token ||= generate_test_token
     {
-      'Authorization' => "Bearer #{token}",
-      'Content-Type' => 'application/json',
-      'Accept' => 'application/json'
+      "Authorization" => "Bearer #{token}",
+      "Content-Type" => "application/json",
+      "Accept" => "application/json"
     }
   end
 
   def generate_test_token
     JWT.encode(
       {
-        sub: 'test_user',
+        sub: "test_user",
         exp: 24.hours.from_now.to_i
       },
       Rails.application.credentials.jwt_secret_key

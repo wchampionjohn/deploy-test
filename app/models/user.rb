@@ -1,3 +1,20 @@
+# frozen_string_literal: true
+
+# == Schema Information
+#
+# Table name: users
+#
+#  id                                    :bigint           not null, primary key
+#  email_address                         :string           not null
+#  kabob_access_token(Kabob平台存取令牌) :string
+#  password_digest                       :string           not null
+#  created_at                            :datetime         not null
+#  updated_at                            :datetime         not null
+#
+# Indexes
+#
+#  index_users_on_email_address  (email_address) UNIQUE
+#
 require "net/http"
 require "net/https"
 require "json"

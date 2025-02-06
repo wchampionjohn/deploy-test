@@ -1,3 +1,26 @@
+# frozen_string_literal: true
+
+# == Schema Information
+#
+# Table name: vast_responses
+#
+#  id                              :bigint           not null, primary key
+#  metadata(其他元資料)            :jsonb
+#  uid(VAST回應唯一識別碼)         :string
+#  vast_version(VAST版本)          :string
+#  vast_xml(VAST XML內容)          :text
+#  created_at                      :datetime         not null
+#  updated_at                      :datetime         not null
+#  ad_request_id(關聯的廣告請求ID) :bigint
+#  impression_id(關聯的展示ID)     :bigint
+#
+# Indexes
+#
+#  index_vast_responses_on_ad_request_id  (ad_request_id)
+#  index_vast_responses_on_impression_id  (impression_id)
+#  index_vast_responses_on_uid            (uid) UNIQUE
+#  index_vast_responses_on_vast_version   (vast_version)
+#
 class VastResponse < ApplicationRecord
   # extends ...................................................................
   # includes ..................................................................
