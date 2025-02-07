@@ -5,7 +5,7 @@
 # if id is not present, fetch all devices
 module Lookr
   class DeviceFetcher
-    Result = Struct.new(:success?, :is_last_page?, :devices, :device, keyword_init: true)
+    Result = Struct.new(:success?, :is_last_page?, :devices, :device, :error_message, keyword_init: true)
 
     def initialize(device_lookr_id: nil, page: 1)
       @device_lookr_id, @page = device_lookr_id, page
@@ -64,6 +64,7 @@ module Lookr
     def find_detail
       is_success = false
       device = {}
+      error_message = ""
 
       response = @http.request(@request)
 
@@ -72,17 +73,21 @@ module Lookr
 
         data = JSON.parse(response.body)
         device = data["device"]
+      else
+        error_message = response.body
       end
 
       Result.new(
         success?: is_success,
-        device: device
+        device: device,
+        error_message: error_message
       )
     end
 
     def fetch_devices
       is_last_page = true
       is_success = false
+      error_message = ""
       devices = []
 
       response = @http.request(@request)
@@ -93,13 +98,15 @@ module Lookr
         data = JSON.parse(response.body)
         devices = data["devices"]
         is_last_page = data["meta"]["total_pages"] == @page
+      else
+        error_message = response.body
       end
-      puts "is_last_page in fetcher: #{is_last_page}"
 
       Result.new(
         success?: is_success,
         is_last_page?: is_last_page,
-        devices: devices
+        devices: devices,
+        error_message: error_message
       )
     end
   end
