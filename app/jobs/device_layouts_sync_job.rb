@@ -10,7 +10,7 @@ class DeviceLayoutsSyncJob < ApplicationJob
 
     unless result.success?
       SystemLog.error.create!(
-        title: "同步裝置 id: #{device.id} 版面失敗！",
+        title: "同步裝置 device_id: #{device.id} block 失敗！",
         notify: false,
         body_payload: {
           "device_id": device_id,
@@ -23,20 +23,31 @@ class DeviceLayoutsSyncJob < ApplicationJob
 
     return true if result.device["layouts"].compact.blank?
 
-    result.device["layouts"].each do |layout|
-      device_layout = DeviceLayout.find_or_create_by!(
-        device_id: device.id,
-        width: layout["width"],
-        height: layout["height"],
-      )
+    uniq_resolutions = result.device["layouts"].flat_map do |layout|
+      layout["blocks"].map do |block|
+        block.slice("width", "height").values
+      end
+    end.uniq
 
-      layout["blocks"].each do |block|
-        DeviceLayoutBlock.find_or_create_by!(device_id: device_id, device_layout_id: device_layout.id, lookr_id: block["id"]) do |dlb|
-          dlb.width = block["width"]
-          dlb.height = block["height"]
-          dlb.index = block["index"]
-        end
+    puts "uniq_resolutions: #{uniq_resolutions.inspect}"
+
+    existing_resolutions = device.screens
+                                 .pluck(:width, :height)
+
+    # 刪除目前存在，但lookr上不找不到的解析度的screen
+    (existing_resolutions - uniq_resolutions).each do |resolution|
+      device.screens
+            .where(width: resolution[0], height: resolution[1])
+            .destroy_all
+    end
+
+    # 新增或修改 lookr 上有，但本地不存在的解析度的 screen
+    uniq_resolutions.each do |resolution|
+      device.screens
+            .find_or_create_by!(width: resolution[0], height: resolution[1]) do |screen|
+        screen.operational_status = "normal"
       end
     end
+
   end
 end

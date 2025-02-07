@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_07_032639) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_07_081347) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -226,13 +226,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_07_032639) do
     t.string "uid", comment: "螢幕唯一識別碼"
     t.string "physical_location", comment: "螢幕實體位置描述"
     t.string "orientation", comment: "螢幕方向：portrait, landscape"
-    t.string "resolution", comment: "解析度，如：1920x1080"
     t.integer "brightness_level", comment: "亮度等級"
     t.string "operational_status", comment: "運作狀態：normal, maintenance, error"
     t.boolean "is_active", default: true, comment: "螢幕是否啟用"
     t.jsonb "settings", default: {}, comment: "螢幕設定"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "width"
+    t.integer "height"
   end
 
   create_table "sessions", force: :cascade do |t|
