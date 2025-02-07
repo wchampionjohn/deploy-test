@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_02_095323) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_03_063607) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -123,7 +123,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_02_095323) do
     t.string "currency", default: "USD", comment: "價格幣別"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "total_budget", precision: 15, scale: 4, comment: "總預算金額"
+    t.decimal "spent_budget", precision: 15, scale: 4, default: "0.0", comment: "已花費預算"
+    t.decimal "commission_rate", precision: 5, scale: 2, comment: "佣金比率(%)"
+    t.string "commission_type", comment: "佣金類型: visible(顯示), hidden(隱藏)"
+    t.jsonb "commission_settings", default: {}, comment: "佣金設定，如最低金額、階梯式佣金等"
     t.index ["ad_space_id"], name: "index_deals_on_ad_space_id"
+    t.index ["commission_type"], name: "index_deals_on_commission_type"
     t.index ["uid"], name: "index_deals_on_uid", unique: true
   end
 
@@ -156,7 +162,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_02_095323) do
     t.jsonb "tracking_events", comment: "VAST追蹤事件記錄"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "publisher_revenue", precision: 10, scale: 4, comment: "發布商收益"
+    t.decimal "platform_revenue", precision: 10, scale: 4, comment: "平台收益(佣金)"
+    t.decimal "commission_rate_snapshot", precision: 5, scale: 2, comment: "執行時的佣金比率快照(%)"
+    t.string "currency", default: "USD", comment: "貨幣類型"
     t.index ["ad_unit_id"], name: "index_impressions_on_ad_unit_id"
+    t.index ["deal_id", "platform_revenue"], name: "index_impressions_on_deal_id_and_platform_revenue"
+    t.index ["deal_id", "publisher_revenue"], name: "index_impressions_on_deal_id_and_publisher_revenue"
     t.index ["deal_id"], name: "index_impressions_on_deal_id"
     t.index ["uid"], name: "index_impressions_on_uid", unique: true
   end
@@ -172,6 +184,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_02_095323) do
     t.text "description", comment: "發布商描述"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "default_commission_rate", precision: 5, scale: 2, comment: "預設佣金比率(%)"
+    t.jsonb "commission_settings", default: {}, comment: "佣金設定，如最低金額、階梯式佣金等"
+    t.boolean "hide_commission", default: false, comment: "是否隱藏佣金資訊"
     t.index ["domain"], name: "index_publishers_on_domain", unique: true
   end
 

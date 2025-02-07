@@ -32,6 +32,11 @@ class Deal < ApplicationRecord
     preferred: "preferred",
     public_auction: "public_auction"
   }
+
+  enum :commission_type, {
+    visible: "visible",
+    hidden: "hidden"
+  }
   # security (i.e. attr_accessible) ...........................................
   # relationships .............................................................
   belongs_to :ad_space
@@ -42,7 +47,15 @@ class Deal < ApplicationRecord
   validates :deal_type, presence: true
   validates :uid, presence: true, uniqueness: true
 
+  validates :commission_rate, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }, allow_nil: true
+  validates :total_budget, numericality: { greater_than: 0 }, allow_nil: true
+  validates :spent_budget, numericality: { greater_than_or_equal_to: 0 }
+  validate :spent_budget_cannot_exceed_total_budget
+
   # callbacks .................................................................
+  before_create :set_default_commission_rate
+  before_save :ensure_commission_settings_format
+
   # scopes ....................................................................
   # scope :by_priority, -> { order(priority: :asc) }
   scope :by_priority, -> {
@@ -70,6 +83,77 @@ class Deal < ApplicationRecord
   def priority_weight
     self.class.deal_type_priority[deal_type]
   end
+
+  def remaining_budget
+    return nil if total_budget.nil?
+    total_budget - spent_budget
+  end
+
+  def budget_spent_percentage
+    return 0 if total_budget.nil? || total_budget.zero?
+    (spent_budget / total_budget * 100).round(2)
+  end
+
+  def set_commission_details!(rate:, type:, settings: {})
+    raise "Unauthorized" unless Current.user.admin?
+
+    update!(
+      commission_rate: rate,
+      commission_type: type,
+      commission_settings: settings
+    )
+  end
+
+  def publisher_view
+    {
+      id: id,
+      name: name,
+      total_budget: commission_type.hidden? ? nil : total_budget,
+      your_revenue: publisher_revenue,     # 只看到自己的收益
+      status: status,
+      start_date: start_date,
+      end_date: end_date
+    }
+  end
+
+  def publisher_revenue
+    impressions.sum(:publisher_revenue)
+  end
+
+  def admin_view
+    {
+      id: id,
+      name: name,
+      total_budget: total_budget,
+      commission_rate: commission_rate,
+      commission_type: commission_type,
+      commission_settings: commission_settings,
+      publisher_revenue: publisher_revenue,
+      platform_revenue: platform_revenue,
+      status: status
+    }
+  end
+
+  def platform_revenue
+    impressions.sum(:platform_revenue)
+  end
   # protected instance methods ................................................
   # private instance methods ..................................................
+  private
+
+  def spent_budget_cannot_exceed_total_budget
+    return if total_budget.nil? || spent_budget.nil?
+    if spent_budget > total_budget
+      errors.add(:spent_budget, "cannot exceed total budget")
+    end
+  end
+
+  def set_default_commission_rate
+    return if commission_rate.present?
+    self.commission_rate = ad_space&.publisher&.default_commission_rate
+  end
+
+  def ensure_commission_settings_format
+    self.commission_settings = {} if commission_settings.nil?
+  end
 end
