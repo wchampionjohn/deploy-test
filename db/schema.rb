@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_03_063607) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_06_140302) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -131,6 +131,25 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_03_063607) do
     t.index ["ad_space_id"], name: "index_deals_on_ad_space_id"
     t.index ["commission_type"], name: "index_deals_on_commission_type"
     t.index ["uid"], name: "index_deals_on_uid", unique: true
+  end
+
+  create_table "device_layout_blocks", force: :cascade do |t|
+    t.bigint "device_id", comment: "關聯的裝置 ID"
+    t.bigint "device_layout_id"
+    t.integer "width"
+    t.integer "height"
+    t.integer "lookr_id"
+    t.integer "index"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "device_layouts", force: :cascade do |t|
+    t.bigint "device_id", comment: "關聯的裝置 ID"
+    t.integer "width"
+    t.integer "height"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "devices", force: :cascade do |t|

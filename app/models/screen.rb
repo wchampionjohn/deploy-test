@@ -31,6 +31,7 @@ class Screen < ApplicationRecord
   validates :orientation, inclusion: { in: %w[portrait landscape] }, allow_nil: true
 
   # callbacks .................................................................
+  before_validation :set_uid, on: :create
   # scopes ....................................................................
   scope :active, -> { where(is_active: true) }
   scope :operational, -> { where(operational_status: "normal") }
@@ -39,4 +40,8 @@ class Screen < ApplicationRecord
   # public instance methods ...................................................
   # protected instance methods ................................................
   # private instance methods ..................................................
+  private
+  def set_uid
+    self.uid ||= SecureRandom.uuid
+  end
 end

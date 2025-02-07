@@ -9,7 +9,7 @@ module Lookr
 
     def initialize(device_lookr_id: nil, page: 1)
       @device_lookr_id, @page = device_lookr_id, page
-      access_token ||= User.last.kabob_access_token
+      access_token = User.last.kabob_access_token
 
       url = if @device_lookr_id.present?
               URI("#{ENV["LOOKR_API_URL"]}/devices/#{@device_lookr_id}")
@@ -34,6 +34,33 @@ module Lookr
     end
 
   private
+    # Sample response from Lookr API
+    # {
+    #   "device": {
+    #     "id": 499,
+    #     "name": "Wei Heng testing - MK",
+    #     "layouts": [
+    #       {
+    #         "width": 1080,
+    #         "height": 1920,
+    #         "viewport_width": 1080,
+    #         "viewport_height": 1920,
+    #         "offset_x": 0,
+    #         "offset_y": 0,
+    #         "blocks": [
+    #           {
+    #             "x": 115,
+    #             "y": 0,
+    #             "width": 965,
+    #             "height": 1920,
+    #             "index": 0,
+    #             "id": 1
+    #           }
+    #         ]
+    #       }
+    #     ]
+    #   }
+    # }
     def find_detail
       is_success = false
       device = {}
