@@ -27,7 +27,7 @@ class Screen < ApplicationRecord
 
   has_many :ad_units
   # validations ...............................................................
-  validates :uid, presence: true
+  validates :uid, presence: true, uniqueness: true
   validates :operational_status, presence: true
   validates :orientation, inclusion: { in: %w[portrait landscape] }, allow_nil: true
   validates :width, :height, numericality: { greater_than: 0 }, presence: true
@@ -38,6 +38,7 @@ class Screen < ApplicationRecord
   scope :active, -> { where(is_active: true) }
   scope :operational, -> { where(operational_status: "normal") }
   # additional config .........................................................
+  attribute :operational_status, :string, default: "normal"
   # class methods .............................................................
   # public instance methods ...................................................
   # protected instance methods ................................................

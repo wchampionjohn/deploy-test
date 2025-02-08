@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# sync lookr 的某台裝置的 layouts 所支援的解析度到本地的 screens table
 class DeviceLayoutsSyncJob < ApplicationJob
   queue_as :low
 
@@ -29,12 +30,10 @@ class DeviceLayoutsSyncJob < ApplicationJob
       end
     end.uniq
 
-    puts "uniq_resolutions: #{uniq_resolutions.inspect}"
-
     existing_resolutions = device.screens
                                  .pluck(:width, :height)
 
-    # 刪除目前存在，但lookr上不找不到的解析度的screen
+    # 刪除目前存在，但 lookr 上不找不到的解析度的 screen
     (existing_resolutions - uniq_resolutions).each do |resolution|
       device.screens
             .where(width: resolution[0], height: resolution[1])
@@ -44,9 +43,7 @@ class DeviceLayoutsSyncJob < ApplicationJob
     # 新增或修改 lookr 上有，但本地不存在的解析度的 screen
     uniq_resolutions.each do |resolution|
       device.screens
-            .find_or_create_by!(width: resolution[0], height: resolution[1]) do |screen|
-        screen.operational_status = "normal"
-      end
+            .find_or_create_by!(width: resolution[0], height: resolution[1])
     end
 
   end

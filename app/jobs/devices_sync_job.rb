@@ -30,15 +30,12 @@ class DevicesSyncJob < ApplicationJob
       end
 
       # 3. put each device id to queue for fetching device layouts and blocks
-      puts "device lookr_id: #{device.lookr_id}"
-      DeviceLayoutsSyncJob.perform_now(device.id)
+      DeviceLayoutsSyncJob.perform_later(device.id)
     end
 
-    puts "page: #{page}"
-    puts "is_last_page: #{result.is_last_page?}"
     # 4. fetch next page if not last page
     unless result.is_last_page?
-      DevicesSyncJob.perform_now(page: page + 1)
+      DevicesSyncJob.perform_later(page: page + 1)
     end
   end
 end
