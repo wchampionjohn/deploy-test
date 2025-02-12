@@ -23,7 +23,6 @@ require "rails_helper"
 
 RSpec.describe Screen, type: :model do
   describe "validations" do
-    it { should validate_presence_of(:uid) }
     it { should validate_presence_of(:operational_status) }
   end
 

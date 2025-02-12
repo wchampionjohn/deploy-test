@@ -24,6 +24,7 @@ class AdUnitTimeMultiplier < ApplicationRecord
 
   validates :day_of_week, inclusion: { in: 0..6 }
   validates :multiplier, numericality: { greater_than: 0 }
+  validates :start_time, :end_time, presence: true
   validate :end_time_after_start_time
 
   # validations ...............................................................
@@ -31,10 +32,18 @@ class AdUnitTimeMultiplier < ApplicationRecord
   # scopes ....................................................................
   # additional config .........................................................
   # class methods .............................................................
+  def self.get_by_time(duration_time)
+    find_by(
+      day_of_week: duration_time.wday,
+      start_time: ..duration_time,
+      end_time: duration_time..
+    )
+  end
+
   # public instance methods ...................................................
   # protected instance methods ................................................
   # private instance methods ..................................................
-  private
+private
   def end_time_after_start_time
     return if end_time.blank? || start_time.blank?
 

@@ -48,4 +48,14 @@ RSpec.describe AdUnit, type: :model do
       expect(ad_unit.supported_formats).to include("video/mp4")
     end
   end
+
+  describe "#on_schedule?" do
+    let(:ad_unit) { create(:ad_unit, :with_24_7) }
+    let(:time) { Time.current }
+    subject { ad_unit.on_scheduled?(time) }
+    context "when ad_unit is on schedule" do
+      it { is_expected.to be_truthy }
+    end
+
+  end
 end

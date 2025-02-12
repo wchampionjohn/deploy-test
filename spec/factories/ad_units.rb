@@ -36,10 +36,19 @@ FactoryBot.define do
     is_active { true }
     floor_price { 100.00 }
     vast_enabled { true }
-    supported_formats { [ "video/mp4", "video/webm", "image/jpeg", "image/png" ] }
+    supported_formats { ["video/mp4", "video/webm", "image/jpeg", "image/png"] }
     settings { { autoplay: true, loop: false } }
     fps { 30 }
     min_duration { 5 }
     max_duration { 30 }
+
+    trait :with_24_7 do
+
+      after :create do |ad_unit|
+        (0..6).to_a.each do |day|
+          ad_unit.ad_unit_time_multipliers << build(:ad_unit_time_multiplier, day_of_week: day)
+        end
+      end
+    end
   end
 end

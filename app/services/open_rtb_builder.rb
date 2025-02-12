@@ -10,23 +10,24 @@ class OpenRtbBuilder
   def build
     {
       id: SecureRandom.uuid,
-      imp: [ {
-        id: SecureRandom.uuid,
-        tagid: @ad_request.ad_unit_id,
-        secure: 1,
-        banner: {
-          w: @ad_unit.size.split("x")[0].to_i,
-          h: @ad_unit.size.split("x")[1].to_i
-        },
-        bidfloor: get_floor_price,
-        bidfloorcur: "USD",
-        dt: @ad_request.estimated_display_time.to_i * 1000,  # 轉換為 Unix timestamp 毫秒
-        qty: build_qty_info
-      } ],
+      imp: [{
+              id: SecureRandom.uuid,
+              tagid: @ad_request.ad_unit_id,
+              secure: 1,
+              banner: {
+                w: @ad_unit.size.split("x")[0].to_i,
+                h: @ad_unit.size.split("x")[1].to_i
+              },
+              bidfloor: get_floor_price,
+              bidfloorcur: "USD",
+              dt: @ad_request.estimated_display_time.to_i * 1000, # 轉換為 Unix timestamp 毫秒
+              qty: build_qty_info
+            }],
       device: build_device_info,
       app: build_app_info,
       user: build_user_info,
-      dooh: build_dooh_info
+      dooh: build_dooh_info,
+      pmp: build_pmp_info
     }.compact
   end
 
@@ -120,7 +121,7 @@ private
       sourcetype: @ad_unit.qty_source_type_value,
       vendor: @ad_unit.qty_vendor,
       ext: @ad_unit.qty_ext
-    }.compact  # 移除 nil 值
+    }.compact # 移除 nil 值
   end
 
   def build_dooh_info
@@ -129,8 +130,8 @@ private
     {
       id: @ad_unit.screen&.uid,
       name: @ad_unit.ad_space.name,
-      venuetype: [ @ad_unit.ad_space.venue_type ].compact,
-      venuetypetax: 1,  # Using OpenOOH Venue Taxonomy
+      venuetype: [@ad_unit.ad_space.venue_type].compact,
+      venuetypetax: 1, # Using OpenOOH Venue Taxonomy
       publisher: {
         id: @ad_unit.ad_space.publisher.id,
         name: @ad_unit.ad_space.publisher.name,
@@ -138,4 +139,43 @@ private
       }.compact
     }.compact
   end
+
+  # {
+  #   "pmp": {
+  #     "private_auction": 1,
+  #     "deals": [
+  #       {
+  #         "id": "deal-123",
+  #         "bidfloor": 0.5,
+  #         "bidfloorcur": "USD",
+  #         "at": 1
+  #       },
+  #       {
+  #         "id": "deal-456",
+  #         "bidfloor": 1.0,
+  #         "bidfloorcur": "USD",
+  #         "at": 1
+  #       }
+  #     ]
+  #   }
+  def build_pmp_info
+    return nil unless @ad_unit.deals.present?
+
+    deals = @ad_unit.deals.map do |deal|
+      {
+        id: deal.uid,
+        bidfloor: deal.bidfloor,
+        bidfloorcur: deal.bidfloorcur,
+        at: deal.auction_type
+      }
+    end
+
+    {
+      "pmp": {
+        "private_auction": 1,
+        "deals": deals
+      }
+    }
+  end
+
 end

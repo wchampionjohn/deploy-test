@@ -4,25 +4,34 @@
 #
 # Table name: deals
 #
-#  id                                              :bigint           not null, primary key
-#  currency(價格幣別)                              :string           default("USD")
-#  deal_type(Deal類型: preferred, private_auction) :string
-#  end_date(結束日期)                              :datetime
-#  is_active(Deal是否啟用)                         :boolean          default(TRUE)
-#  name(Deal名稱)                                  :string
-#  price(價格(CPM))                                :decimal(10, 4)
-#  priority(優先順序)                              :integer
-#  settings(Deal設定)                              :jsonb
-#  start_date(開始日期)                            :datetime
-#  uid(Deal唯一識別碼)                             :string
-#  created_at                                      :datetime         not null
-#  updated_at                                      :datetime         not null
-#  ad_space_id(廣告版位ID)                         :bigint
+#  id                                                      :bigint           not null, primary key
+#  auction_type(First Price Auction, Second Price Auction) :string
+#  bidfloor(底價)                                          :decimal(10, 4)
+#  bidfloorcur(底價幣別)                                   :string
+#  commission_rate(佣金比率(%))                            :decimal(5, 2)
+#  commission_settings(佣金設定，如最低金額、階梯式佣金等) :jsonb
+#  commission_type(佣金類型: visible(顯示), hidden(隱藏))  :string
+#  currency(價格幣別)                                      :string           default("USD")
+#  deal_type(Deal類型: preferred, private_auction)         :string
+#  end_date(結束日期)                                      :datetime
+#  is_active(Deal是否啟用)                                 :boolean          default(TRUE)
+#  name(Deal名稱)                                          :string
+#  price(價格(CPM))                                        :decimal(10, 4)
+#  priority(優先順序)                                      :integer
+#  settings(Deal設定)                                      :jsonb
+#  spent_budget(已花費預算)                                :decimal(15, 4)   default(0.0)
+#  start_date(開始日期)                                    :datetime
+#  total_budget(總預算金額)                                :decimal(15, 4)
+#  uid(Deal唯一識別碼)                                     :string
+#  created_at                                              :datetime         not null
+#  updated_at                                              :datetime         not null
+#  ad_space_id(廣告版位ID)                                 :bigint
 #
 # Indexes
 #
-#  index_deals_on_ad_space_id  (ad_space_id)
-#  index_deals_on_uid          (uid) UNIQUE
+#  index_deals_on_ad_space_id      (ad_space_id)
+#  index_deals_on_commission_type  (commission_type)
+#  index_deals_on_uid              (uid) UNIQUE
 #
 class Deal < ApplicationRecord
   # extends ...................................................................
@@ -36,6 +45,11 @@ class Deal < ApplicationRecord
   enum :commission_type, {
     visible: "visible",
     hidden: "hidden"
+  }
+
+  enum :auction_type, {
+    first_price: "first_price",
+    second_price: "second_price"
   }
   # security (i.e. attr_accessible) ...........................................
   # relationships .............................................................
@@ -64,12 +78,14 @@ class Deal < ApplicationRecord
       WHEN 'preferred' THEN 2
       WHEN 'public_auction' THEN 3
       END"),
-      priority: :asc,
-      price: :desc)
+          priority: :asc,
+          price: :desc)
   }
 
   scope :active, -> { where(is_active: true) }
   # additional config .........................................................
+  delegate :ad_units, to: :ad_space
+  attribute :auction_type, :string, default: "second_price"
   # class methods .............................................................
   def self.deal_type_priority
     {
@@ -77,6 +93,10 @@ class Deal < ApplicationRecord
       "preferred" => 2,
       "public_auction" => 3
     }
+  end
+
+  def self.best_deal
+    by_priority.first
   end
 
   # public instance methods ...................................................
@@ -109,7 +129,7 @@ class Deal < ApplicationRecord
       id: id,
       name: name,
       total_budget: commission_type.hidden? ? nil : total_budget,
-      your_revenue: publisher_revenue,     # 只看到自己的收益
+      your_revenue: publisher_revenue, # 只看到自己的收益
       status: status,
       start_date: start_date,
       end_date: end_date
@@ -137,9 +157,16 @@ class Deal < ApplicationRecord
   def platform_revenue
     impressions.sum(:platform_revenue)
   end
+
+  # 用於從 array 中找出最佳deal
+  # ie.[deal1, deal2, deal3].sort { |deal| deal.rank_value }
+  def rank_value
+    [-self.class.deal_type_priority[deal_type], self.price]
+  end
+
   # protected instance methods ................................................
   # private instance methods ..................................................
-  private
+private
 
   def spent_budget_cannot_exceed_total_budget
     return if total_budget.nil? || spent_budget.nil?
