@@ -56,8 +56,8 @@ private
       geo: {
         # country: @ad_request.location.country,
         # city: @ad_request.location.city,
-        lat: @ad_request.geo_location["lat"],
-        lon: @ad_request.geo_location["lon"]
+        lat: @ad_request.geo_location&.dig("lat"),
+        lon: @ad_request.geo_location&.dig("lon")
       }
     }
   end
