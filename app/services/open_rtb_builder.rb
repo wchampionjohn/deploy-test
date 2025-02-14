@@ -10,24 +10,16 @@ class OpenRtbBuilder
   def build
     {
       id: SecureRandom.uuid,
-      imp: [{
-              id: SecureRandom.uuid,
-              tagid: @ad_request.ad_unit_id,
-              secure: 1,
-              banner: {
-                w: @ad_unit.size.split("x")[0].to_i,
-                h: @ad_unit.size.split("x")[1].to_i
-              },
-              bidfloor: get_floor_price,
-              bidfloorcur: "USD",
-              dt: @ad_request.estimated_display_time.to_i * 1000, # 轉換為 Unix timestamp 毫秒
-              qty: build_qty_info
-            }],
+      imp: imp(@ad_unit),
       device: build_device_info,
       app: build_app_info,
       user: build_user_info,
       dooh: build_dooh_info,
-      pmp: build_pmp_info
+      pmp: build_pmp_info,
+      bcat: %w[IAB7-28 IAB8-5 IAB9-9],
+      acat: %w[IAB3 IAB5 IAB14],
+      cattax: 2,
+      tmax: 500 # DSP 回應的時間限制，超時則 SSP 不再等待。
     }.compact
   end
 
@@ -35,6 +27,37 @@ private
 
   def get_floor_price
     @ad_unit.ad_space.floor_price
+  end
+
+  # 先依照長寬支援圖片與影片，串 DSP 後再依照實際情況調整
+  def imp(ad_unit)
+    w, h = ad_unit.size.split("x").map(&:to_i)
+
+    [
+      {
+        id: SecureRandom.uuid,
+        tagid: "tag-#{ad_unit.id}", # 暫時先用 ad_unit 的 id
+        instl: 1, # 是否為全螢幕展示（1 = 是，0 = 否）
+        bidfloor: get_floor_price,
+        bidfloorcur: "USD",
+        secure: 1,
+        banner: {
+          w: w,
+          h: h,
+          pos: 1
+        },
+        video: {
+          mimes: ["video_mp4"],
+          minduration: 5, # 最短影片長度 (秒)
+          maxduration: 30, # 最長影片長度 (秒)
+          protocols: [2, 3, 5, 6, 7, 8], # 支援  VAST 2.0、3.0、4.0
+          w: w,
+          h: h,
+          startdelay: 0, # 影片開始播放的延遲時間，0 代表 自動播放（instream pre-roll）-1 代表隨機播放 (on user action) >0 代表延遲播放(秒數)
+          placement: 3 # 3	In-article（文章或動態中的影片廣告），影片廣告會像 Facebook 動態影片廣告 或 新聞網站內嵌影片廣告，而不是 YouTube 這種 Pre-roll 廣告。
+        }
+      }
+    ]
   end
 
   # bid_request: {
@@ -177,5 +200,4 @@ private
       }
     }
   end
-
 end
