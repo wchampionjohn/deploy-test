@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_12_110155) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_14_085441) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -42,6 +42,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_12_110155) do
     t.index ["estimated_display_time"], name: "index_ad_requests_on_estimated_display_time"
     t.index ["notification_status"], name: "index_ad_requests_on_notification_status"
     t.index ["uid"], name: "index_ad_requests_on_uid", unique: true
+  end
+
+  create_table "ad_space_content_taxonomies", force: :cascade do |t|
+    t.integer "ad_space_id"
+    t.integer "content_taxonomy_id"
+    t.string "cat_type", comment: "acat(Audience Category) or bcat(Blocking Category)"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ad_space_id"], name: "index_ad_space_content_taxonomies_on_ad_space_id"
+    t.index ["content_taxonomy_id"], name: "index_ad_space_content_taxonomies_on_content_taxonomy_id"
   end
 
   create_table "ad_spaces", force: :cascade do |t|
@@ -93,6 +103,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_12_110155) do
     t.integer "qty_source_type", default: 0, comment: "廣告單元底價來源類型"
     t.string "qty_vendor", comment: "廣告單元底價來源廠商"
     t.jsonb "qty_ext"
+  end
+
+  create_table "content_taxonomies", comment: "from IAB Content Taxonomies", force: :cascade do |t|
+    t.string "iab_unique_id"
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["iab_unique_id"], name: "index_content_taxonomies_on_iab_unique_id", unique: true
   end
 
   create_table "deal_buyers", force: :cascade do |t|

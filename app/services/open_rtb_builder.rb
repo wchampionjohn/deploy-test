@@ -5,6 +5,7 @@ class OpenRtbBuilder
   def initialize(ad_request)
     @ad_request = ad_request
     @ad_unit = ad_request.ad_unit
+    @ad_space = @ad_unit.ad_space
   end
 
   def build
@@ -16,9 +17,9 @@ class OpenRtbBuilder
       user: build_user_info,
       dooh: build_dooh_info,
       pmp: build_pmp_info,
-      bcat: %w[IAB7-28 IAB8-5 IAB9-9],
-      acat: %w[IAB3 IAB5 IAB14],
-      cattax: 2,
+      bcat: @ad_space.cat_list("bcat"), # block categories
+      acat: @ad_space.cat_list("acat"), # allowed categories
+      cattax: 2, #  IAB 內容分類標準 2.0（IAB Content Taxonomy 2.0）
       tmax: 500 # DSP 回應的時間限制，超時則 SSP 不再等待。
     }.compact
   end
