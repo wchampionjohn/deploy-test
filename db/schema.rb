@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_14_085441) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_17_025128) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -37,6 +37,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_14_085441) do
     t.datetime "notified_at", comment: "通知時間"
     t.decimal "applied_multiplier", precision: 10, scale: 4, comment: "廣告單元底價倍率"
     t.datetime "estimated_display_time", comment: "預估顯示時間"
+    t.jsonb "bid_response"
+    t.string "win_bid_id"
+    t.decimal "win_bid_price", precision: 10, scale: 4
+    t.string "win_bid_imp_id"
     t.index ["ad_unit_id"], name: "index_ad_requests_on_ad_unit_id"
     t.index ["device_id"], name: "index_ad_requests_on_device_id"
     t.index ["estimated_display_time"], name: "index_ad_requests_on_estimated_display_time"

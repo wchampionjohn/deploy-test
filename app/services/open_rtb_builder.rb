@@ -11,7 +11,7 @@ class OpenRtbBuilder
   def build
     {
       id: SecureRandom.uuid,
-      imp: imp(@ad_unit),
+      imp: imp,
       device: build_device_info,
       app: build_app_info,
       user: build_user_info,
@@ -31,13 +31,13 @@ private
   end
 
   # 先依照長寬支援圖片與影片，串 DSP 後再依照實際情況調整
-  def imp(ad_unit)
-    w, h = ad_unit.size.split("x").map(&:to_i)
+  def imp
+    w, h = @ad_unit.size.split("x").map(&:to_i)
 
-    [
+    result = [
       {
         id: SecureRandom.uuid,
-        tagid: "tag-#{ad_unit.id}", # 暫時先用 ad_unit 的 id
+        tagid: "tag-#{@ad_unit.id}", # 暫時先用 ad_unit 的 id
         instl: 1, # 是否為全螢幕展示（1 = 是，0 = 否）
         bidfloor: get_floor_price,
         bidfloorcur: "USD",
@@ -47,18 +47,29 @@ private
           h: h,
           pos: 1
         },
-        video: {
-          mimes: ["video_mp4"],
-          minduration: 5, # 最短影片長度 (秒)
-          maxduration: 30, # 最長影片長度 (秒)
-          protocols: [2, 3, 5, 6, 7, 8], # 支援  VAST 2.0、3.0、4.0
-          w: w,
-          h: h,
-          startdelay: 0, # 影片開始播放的延遲時間，0 代表 自動播放（instream pre-roll）-1 代表隨機播放 (on user action) >0 代表延遲播放(秒數)
-          placement: 3 # 3	In-article（文章或動態中的影片廣告），影片廣告會像 Facebook 動態影片廣告 或 新聞網站內嵌影片廣告，而不是 YouTube 這種 Pre-roll 廣告。
-        }
       }
     ]
+
+    if @ad_unit.vast_enabled?
+      result.first.merge!(video: vast_config)
+    end
+
+    result
+  end
+
+  def vast_config
+    size = @ad_unit.size.split("x")
+
+    {
+      mimes: @ad_unit.supported_formats,
+      protocols: [2, 3, 5, 6], # VAST 2.0, 3.0, 4.0, 4.1
+      w: size[0].to_i,
+      h: size[1].to_i,
+      linearity: 1,
+      playbackmethod: [2], # Auto-play with sound on
+      delivery: [1], # Download and play
+      pos: @ad_unit.placement["position"] == "fullscreen" ? 7 : 0
+    }
   end
 
   # bid_request: {

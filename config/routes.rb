@@ -15,6 +15,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :bid_requests, only: [ :create ]
+      resources :bid_responses, only: [ :create ]
       resources :ad_callbacks, only: [] do
         collection do
           post :creative_loaded
