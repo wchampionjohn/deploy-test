@@ -22,12 +22,14 @@
 FactoryBot.define do
   factory :screen do
     device
-    sequence(:uid) { |n| "SCREEN-#{n}" }
+    sequence(:uid) { |n| "SCREEN-#{SecureRandom.hex(4)}-#{n}" }
     physical_location { "一樓電梯大廳" }
     orientation { "landscape" }
     brightness_level { 80 }
     operational_status { "normal" }
     is_active { true }
     settings { { refresh_rate: "60hz" } }
+    width { 1920 }
+    height { 1080 }
   end
 end

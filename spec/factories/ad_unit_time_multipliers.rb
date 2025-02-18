@@ -17,6 +17,13 @@
 #
 FactoryBot.define do
   factory :ad_unit_time_multiplier do
-    
+    multiplier { 1.0 }
+    start_time { Time.current.beginning_of_day }
+    end_time { Time.current.end_of_day }
+
+    trait :morning do
+      start_time { Time.current.change(hour: 6) } # am 6
+      end_time { Time.current.change(hour: 10) }
+    end
   end
 end

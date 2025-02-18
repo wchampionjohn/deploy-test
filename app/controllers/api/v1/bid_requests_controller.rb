@@ -6,8 +6,9 @@ module Api
       skip_before_action :verify_authenticity_token
       allow_unauthenticated_access only: :create
 
+      before_action :find_device, only: :create
+
       def create
-        validate_params!
         processor = BidRequestProcessor.new(build_ad_request)
         Rails.logger.info("Bid request: #{processor.inspect}")
         bid_response = processor.process
@@ -24,46 +25,25 @@ module Api
         render json: { error: e.message }, status: :unprocessable_entity
       end
 
-      private
-
-      def validate_params!
-        unless bid_params[:ad_unit_id].present? && bid_params[:device_id].present?
-          raise ArgumentError, "Missing required parameters"
-        end
-
-        @ad_unit = AdUnit.find(bid_params[:ad_unit_id])
-        @device = Device.find(bid_params[:device_id])
-      rescue ActiveRecord::RecordNotFound => e
-        raise ArgumentError, "Invalid #{e.model.underscore.humanize.downcase}"
-      end
+    private
 
       def build_ad_request
-        # 從請求中獲取預計播放時間，如果沒有提供則使用當前時間
-        display_time = Time.at(bid_params[:dt].to_i) if bid_params[:dt]
+        form = ::DSP::AdRequestForm.new(@device, params: bid_params)
+        raise ArgumentError, form.errors.full_messages.to_sentence unless form.save
+        form.ad_request
+      end
 
-        # 先創建 AdRequest 實例但不保存
-        ad_request = AdRequest.new(
-          ad_unit: @ad_unit,
-          device: @device,
-          ip_address: bid_params[:ip],
-          user_agent: bid_params[:user_agent],
-          processed_at: bid_params[:timestamp],
-          geo_location: bid_params[:geo],
-          estimated_display_time: display_time,
-          applied_multiplier: @ad_unit.get_multiplier_for_time(display_time),
-          notification_status: :pending
-        )
-
-        # 使用 ad_request 實例來建立 bid_request
-        ad_request.bid_request = OpenRtbBuilder.new(ad_request).build
-        ad_request.save!
-        ad_request
+      def find_device
+        @device = Device.find_by(id: bid_params[:device_id])
+        if @device.nil?
+          render json: { error: "Device not found: #{bid_params[:device_id]}" }, status: :unprocessable_entity
+        end
       end
 
       def bid_params
         params.require(:bid_request).permit(
-          :ad_unit_id, :device_id, :ip, :user_agent, :timestamp, :dt,
-          geo: [ :lat, :lon ]
+          :device_id, :width, :height, :ip, :user_agent, :timestamp, :dt, resolution: [:width, :height],
+          geo: [:lat, :lon]
         )
       end
     end

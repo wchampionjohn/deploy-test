@@ -25,7 +25,7 @@
 #
 FactoryBot.define do
   factory :device do
-    sequence(:uid) { |n| "DEVICE-#{n}" }
+    sequence(:uid) { |n| "DEVICE-uuid-#{SecureRandom.hex(4)}-#{n}" }
     sequence(:name) { |n| "Device #{n}" }
     platform { "Android" }
     properties { { model: "Model X", manufacturer: "ACME" } }

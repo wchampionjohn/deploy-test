@@ -7,6 +7,7 @@
 #  id                                          :bigint           not null, primary key
 #  applied_multiplier(廣告單元底價倍率)        :decimal(10, 4)
 #  bid_request(OpenRTB請求內容)                :jsonb
+#  bid_response                                :jsonb
 #  burl(Bid URL)                               :string
 #  error_message(錯誤信息)                     :string
 #  estimated_display_time(預估顯示時間)        :datetime
@@ -23,10 +24,13 @@
 #  status(請求狀態: pending, processed, error) :string
 #  uid(廣告請求唯一識別碼)                     :string
 #  user_agent(用戶代理信息)                    :jsonb
+#  win_bid_price                               :decimal(10, 4)
 #  created_at                                  :datetime         not null
 #  updated_at                                  :datetime         not null
 #  ad_unit_id(關聯的廣告單元ID)                :bigint
 #  device_id(關聯的裝置ID)                     :bigint
+#  win_bid_id                                  :string
+#  win_bid_imp_id                              :string
 #
 # Indexes
 #

@@ -30,9 +30,10 @@ module RequestHelper
         ad_unit_id: options[:ad_unit_id],
         device_id: options[:device_id],
         ip: options[:ip] || "192.168.1.1",
+        resolution: options[:resolution] || { width: 640, height: 480 },
         user_agent: options[:user_agent] || "Mozilla/5.0",
         timestamp: options[:timestamp] || Time.current.iso8601,
-        dt: options[:dt],  # 預計播放時間
+        dt: options[:dt] || Time.current.to_i, # 預計播放時間
         geo: options[:geo] || {
           lat: 25.0330,
           lon: 121.5654,

@@ -40,11 +40,53 @@ class Screen < ApplicationRecord
   # additional config .........................................................
   attribute :operational_status, :string, default: "normal"
   # class methods .............................................................
+  #
+  # 1. lookr request ad
+  # 2. 依據解析度找到 screens
+  # 3. 找到每個 screens 的 ad_units
+  # 4. 過濾掉時間不符合的 ad_units
+  # 5. 找到每個 ad_units 的最佳 deal，(沒有deal就先濾掉，但也有可能不用，看DSP規格再決定)
+  # 6. 比較每個最佳 deal，取得 deal 最佳的 ad_unit
+  # 7. 最佳的 ad_unit 就是此次的 ad_request 的 ad_unit
+  # 8. 送 bid_request 給 DSP 時後帶 deal_id
+  def self.find_optimal_ad_unit(duration_time)
+    # 過濾掉時間不符合的 ad_units
+    scheduled_ad_units = ad_units.active.select do |ad_unit|
+      ad_unit.on_scheduled?(duration_time)
+    end
+    # 找到每個 ad_units 的最佳 deal，(沒有deal就先濾掉，但也有可能不用，看DSP規格再決定)
+    ad_units_with_best_deal = scheduled_ad_units.map do |ad_unit|
+      {
+        ad_unit: ad_unit,
+        deal: ad_unit.best_deal
+      }
+    end
+
+    # 比較每個最佳 deal，取得 deal 最佳的 ad_unit
+    sorted_ad_units = ad_units_with_best_deal.sort do |deal_a, deal_b|
+      # 比較的兩個 ad_unit 都有 deal，則比較 sorting value
+      if deal_a[:deal] && deal_b[:deal]
+        deal_a[:deal].rank_value <=> deal_b[:deal].rank_value
+      elsif deal_a[:deal]
+        -1
+      elsif deal_b[:deal]
+        1
+      else
+        0
+      end
+    end
+
+    sorted_ad_units.first
+  end
+
   # public instance methods ...................................................
   # protected instance methods ................................................
   # private instance methods ..................................................
-  private
+private
   def set_uid
-    self.uid ||= SecureRandom.uuid
+    loop do
+      self.uid ||= SecureRandom.uuid
+      break unless Screen.exists?(uid: uid)
+    end
   end
 end
