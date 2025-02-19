@@ -37,7 +37,7 @@ gem "dotenv-rails"
 # background jobs
 gem "redis", "5.3.0"
 gem "redis-namespace", "1.11.0"
-gem "sidekiq", "7.3.7"
+gem "sidekiq", "7.3.9"
 gem "sidekiq-scheduler", "5.0.6"
 gem "whenever", "1.0.0"
 
