@@ -62,7 +62,7 @@ group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
 
-  gem "annotaterb", "4.13.0"
+  gem "annotaterb", "4.14.0"
   gem "rubocop", "1.68.0"
 end
 
