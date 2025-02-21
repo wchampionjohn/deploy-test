@@ -6,8 +6,11 @@ if [ -z "${LD_PRELOAD+x}" ]; then
     export LD_PRELOAD
 fi
 
-echo "12345" | base64 --decode > /rails/config/database.yml
-echo "$ENV_FILE" | base64 --decode > /rails/.env
+echo "$DATABASE_YML" > /rails/config/database.yml
+echo "$ENV_FILE" > /rails/.env
+echo "========================================"
+echo "$ENV_FILE"
+echo "========================================"
 
 
 # If running the rails server then create or migrate existing database
