@@ -8,10 +8,15 @@ fi
 
 echo "$DATABASE_YML" > /rails/config/database.yml
 echo "$ENV_FILE" > /rails/.env
-echo "========================================"
-echo "$ENV_FILE"
-echo "========================================"
 
+echo "======================================="
+echo "$DATABASE_YML"
+echo "$ENV_FILE"
+echo "======================================="
+
+echo "==============a cat======================"
+cat /rails/config/database.yml
+echo "======================================="
 
 # If running the rails server then create or migrate existing database
 if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
