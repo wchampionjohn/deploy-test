@@ -122,3 +122,6 @@ builder:
 #     port: 6379
 #     directories:
 #       - data:/data
+commands:
+  deploy: "docker-compose -f /home/deploy/docker-compose.yml up -d"
+  rollback: "docker-compose -f /home/deploy/docker-compose.yml down && docker-compose -f /home/deploy/docker-compose.yml up -d"
