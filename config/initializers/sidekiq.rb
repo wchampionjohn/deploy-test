@@ -16,11 +16,11 @@ end
 
 
 Sidekiq.configure_client do |config|
-  config.redis = { url: "redis://#{redis_url}" }
+  config.redis = { url: "redis://#{ENV["REDIS_URL"]}" }
 end
 
 Sidekiq.configure_server do |config|
-  config.redis = { url: "redis://#{redis_url}" }
+  config.redis = { url: "redis://#{ENV["REDIS_URL"]}" }
   config.on(:startup) do
     Sidekiq.schedule = YAML.load_file("config/sidekiq_scheduler.yml") || []
     SidekiqScheduler::Scheduler.instance.reload_schedule!
