@@ -40,20 +40,6 @@ jobs:
           ssh-keyscan 34.80.69.176 >> ~/.ssh/known_hosts
         env:
          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: 'Create env file'
-        run: |
-          touch .env
-          echo LOOKR_API_URL="https://staging.lookr.io/api/v3" >> .env
-          echo CONNECTOR_API_URL="http://34.80.69.176" >> .env
-          echo REDIS_URL="conector-api-redis:6379/15" >> .env
-          echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
-          echo KAMAL_REGISTRY_PASSWORD=${{ secrets.KAMAL_REGISTRY_PASSWORD }} >> .env
-          echo RAILS_MASTER_KEY=${{ secrets.RAILS_MASTER_KEY }} >> .env
-          echo "========end============"
-        env:
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-      - name: Debug .env file
-        run: cat .env
       - name: Deploy with Kamal
         run: dotenv bin/kamal deploy
         env:
