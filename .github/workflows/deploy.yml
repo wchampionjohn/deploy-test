@@ -55,7 +55,7 @@ jobs:
       - name: Debug .env file
         run: cat .env
       - name: Deploy with Kamal
-        run: dotenv kamal deploy
+        run: dotenv bin/kamal deploy
         env:
           KAMAL_REGISTRY_PASSWORD: ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
