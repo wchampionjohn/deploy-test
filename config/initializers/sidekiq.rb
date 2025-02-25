@@ -20,7 +20,7 @@ Sidekiq.configure_client do |config|
 end
 
 Sidekiq.configure_server do |config|
-  config.redis = { url: "redis://conector-api-redis:6379/15}" }
+  config.redis = { url: "redis://conector-api-redis:6379/15" }
   config.on(:startup) do
     Sidekiq.schedule = YAML.load_file("config/sidekiq_scheduler.yml") || []
     SidekiqScheduler::Scheduler.instance.reload_schedule!
