@@ -64,7 +64,7 @@ RUN groupadd --system --gid 1000 rails && \
     chown rails:rails .env
 USER 1000:1000
 
-COPY config/database.sample.yml /rails/config/database.yml
+COPY config/database.yml.example /rails/config/database.yml
 
 # Entrypoint prepares the database.
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
