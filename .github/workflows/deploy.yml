@@ -49,15 +49,13 @@ jobs:
           echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
           echo KAMAL_REGISTRY_PASSWORD=${{ secrets.KAMAL_REGISTRY_PASSWORD }} >> .env
           echo RAILS_MASTER_KEY=${{ secrets.RAILS_MASTER_KEY }} >> .env
-          echo "========showing============"
-          cat .env
           echo "========end============"
         env:
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
       - name: Debug .env file
         run: cat .env
       - name: Deploy with Kamal
-        run: bin/kamal deploy
+        run: dotenv kamal deploy
         env:
           KAMAL_REGISTRY_PASSWORD: ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
