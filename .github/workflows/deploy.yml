@@ -46,10 +46,12 @@ jobs:
           echo LOOKR_API_URL="https://staging.lookr.io/api/v3" >> .env
           echo CONNECTOR_API_URL="http://34.80.69.176" >> .env
           echo REDIS_URL="conector-api-redis:6379/15" >> .env
-          echo DATABASE_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
+          echo DATABASE_PASSWORD="$POSTGRES_PASSWORD" >> .env
           echo KAMAL_REGISTRY_PASSWORD=${{ secrets.KAMAL_REGISTRY_PASSWORD }} >> .env
           echo RAILS_MASTER_KEY=${{ secrets.RAILS_MASTER_KEY }} >> .env
           cat .env
+        env:
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
       - name: Deploy with Kamal
         run: bin/kamal deploy
         env:
