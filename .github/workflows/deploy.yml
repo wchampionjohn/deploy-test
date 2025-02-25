@@ -40,7 +40,11 @@ jobs:
           ssh-keyscan 34.80.69.176 >> ~/.ssh/known_hosts
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-
+      - name: Debug SSH Key
+        run: |
+          ls -l ~/.ssh
+          cat ~/.ssh/id_rsa | head -n 5
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa user@34.80.69.176 "echo 'SSH Connection Successful!'"
       - name: 'Create env file'
         run: |
           echo API_ENDPOINTLOOKR_API_URL="https://staging.lookr.io/api/v3" >> .env
