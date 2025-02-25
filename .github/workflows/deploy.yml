@@ -44,8 +44,11 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           ls -l ~/.ssh
+          echo "====show====" 
           echo "${{ secrets.SSH_PRIVATE_KEY }}" 
+          echo "====end====" 
           echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 --decode > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
           cat ~/.ssh/id_rsa | head -n 5
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa user@34.80.69.176 "echo 'SSH Connection Successful!'"
       - name: 'Create env file'
