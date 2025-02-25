@@ -32,8 +32,8 @@ jobs:
         uses: docker/setup-buildx-action@v3
       - name: Debug SSH Key
         run: |
-          ls -l ~/.ssh
           mkdir -p ~/.ssh
+          ls -l ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" 
           cat ~/.ssh/id_rsa | head -n 5
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa user@34.80.69.176 "echo 'SSH Connection Successful!'"
