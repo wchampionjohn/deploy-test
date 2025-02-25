@@ -25,6 +25,7 @@ env:
   secret:
     - RAILS_MASTER_KEY
     - POSTGRES_PASSWORD
+    - LOOKR_API_URL
   clear:
     SOLID_QUEUE_IN_PUMA: true
 aliases:
