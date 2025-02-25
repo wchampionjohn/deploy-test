@@ -42,7 +42,8 @@ jobs:
          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: 'Create env file'
         run: |
-          echo API_ENDPOINTLOOKR_API_URL="https://staging.lookr.io/api/v3" >> .env
+          touch .env
+          echo LOOKR_API_URL="https://staging.lookr.io/api/v3" >> .env
           echo CONNECTOR_API_URL="http://34.80.69.176" >> .env
           echo REDIS_URL="conector-api-redis:6379/15" >> .env
           echo DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} >> .env
