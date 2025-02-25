@@ -60,4 +60,4 @@ accessories:
       - data:/data
     options:
       network: 'conector'
-deploy_timeout: 10
+deploy_timeout: 20
