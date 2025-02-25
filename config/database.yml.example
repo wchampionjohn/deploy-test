@@ -8,6 +8,6 @@ production:
     database: conector_production
     host: conector-api-db
     username: kk1234
-    password: <%= ENV["DATABASE_PASSWORD"] %>
+    password: <%= ENV.fetch("DATABASE_PASSWORD") %>
     pool: 10
     <<: *default
