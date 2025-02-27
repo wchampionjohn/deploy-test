@@ -2,25 +2,25 @@ service: conector-api
 
 image: wchampionjohn/conector-api-web
 ssh:
-  user: deploy
+  user: "ec2-user"
 servers:
-  web:
-    hosts:
-      - 34.80.69.176
-    options:
-      network: 'conector'
   job:
     hosts:
-      - 34.80.69.176
+      - staging_io
     cmd: bundle exec sidekiq -q default -q low -q critical -q unsafe
-    options:
-      network: 'conector'
+    proxy: false
+  web:
+    hosts:
+      - staging_io  # from ssh config
+    proxy: false
+    labels:
+      kamal.role: web
+
 registry:
   server: ghcr.io
   username: wchampionjohn
   password:
     - KAMAL_REGISTRY_PASSWORD
-
 env:
   secret:
     - RAILS_MASTER_KEY
@@ -50,7 +50,7 @@ builder:
 accessories:
   db:
     image: postgres:16
-    host: 34.80.69.176
+    host: staging_io
     env:
       clear:
         POSTGRES_USER: 'kk1234'
@@ -59,14 +59,10 @@ accessories:
         - POSTGRES_PASSWORD
     directories:
       - data:/var/lib/postgresql/data
-    options:
-      network: 'conector'
 
   redis:
     image: redis:7.0
-    host: 34.80.69.176
+    host: staging_io
     directories:
       - data:/data
-    options:
-      network: 'conector'
 deploy_timeout: 20
