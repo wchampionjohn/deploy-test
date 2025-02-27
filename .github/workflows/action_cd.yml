@@ -39,7 +39,7 @@ jobs:
           ssh-add ~/.ssh/id_rsa
           ssh-keyscan 18.179.12.69 >> ~/.ssh/known_hosts  # bastion 的 IP
           ssh-keyscan 172.31.45.33 >> ~/.ssh/known_hosts  # staging_io 的 IP
-          ssh -J ec2-user@18.179.12.69:22345 ec2-user@172.31.45.33 -p 22
+          ssh -o StrictHostKeyChecking=no -J ec2-user@18.179.12.69:22345 ec2-user@172.31.45.33 -p 22
         env:
          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: Deploy with Kamal
