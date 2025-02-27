@@ -2,22 +2,23 @@
 
 echo "Running post-deploy script" >> /tmp/kamal-post-deploy.log
 
-OUTPUT=$(kamal server exec -- docker ps --format '{{.ID}}\ {{.Names}}' | grep conector-api-web)
+OUTPUT=$(kamal server -d staging exec -- docker ps --format '{{.ID}}\ {{.Names}}' | grep conector-api-web-staging)
 CONTAINER_ID=$(echo "$OUTPUT" | awk '{print $1}')
 CONTAINER_NAME=$(echo "$OUTPUT" | awk '{print $2}')
 
 echo "Container ID: $CONTAINER_ID"
 echo "Container Name: $CONTAINER_NAME"
 
-
 if [ -n "$CONTAINER_ID" ]; then
-    echo "Renaming container $CONTAINER_NAME ($CONTAINER_ID) to conector-app" >> /tmp/kamal-post-deploy.log
-    kamal server exec -q docker stop conector-app
-    kamal server exec -q docker rm conector-app
-    kamal server exec -q docker stop "$CONTAINER_ID"
-    kamal server exec -q docker rename "$CONTAINER_NAME" conector-app
-    kamal server exec -q docker start conector-app
+    echo "Renaming container $CONTAINER_NAME ($CONTAINER_ID) to conector-api-app-1" >> /tmp/kamal-post-deploy.log
+    kamal server -d staging exec -q docker stop conector-api-app-1
+    kamal server -d staging exec -q docker rm conector-api-app-1
+    kamal server -d staging exec -q docker stop "$CONTAINER_ID"
+    kamal server -d staging exec -q docker rename "$CONTAINER_NAME" conector-api-app-1
+    kamal server -d staging exec -q docker start conector-api-app-1
     echo "Container renamed to conector-app and restarted" >> /tmp/kamal-post-deploy.log
 else
     echo "No matching container found, skipping rename." >> /tmp/kamal-post-deploy.log
 fi
+
+kamal server -d staging exec -q docker network connect caddy_default conector-api-app-1

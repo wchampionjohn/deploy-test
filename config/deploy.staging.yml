@@ -1,4 +1,5 @@
 service: conector-api
+hooks_path: .kamal/hooks/staging
 
 image: wchampionjohn/conector-api-web
 ssh:
