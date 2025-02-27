@@ -2,7 +2,7 @@ name: Create Staging promotion pull request
 on:
   push:
     branches:
-      - master
+      - main
 jobs:
   stagingPromotion:
     runs-on: ubuntu-latest
