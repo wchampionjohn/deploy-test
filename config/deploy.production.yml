@@ -1,0 +1,69 @@
+service: conector-api
+hooks_path: .kamal/hooks/production
+
+image: wchampionjohn/conector-api-web
+ssh:
+  user: deploy
+servers:
+  job:
+    hosts:
+      - 34.80.69.176
+    cmd: bundle exec sidekiq -q default -q low -q critical -q unsafe
+    proxy: false
+  web:
+    hosts:
+      - 34.80.69.176
+    proxy: false
+    options:
+      publish: "80:3000"
+
+registry:
+  server: ghcr.io
+  username: wchampionjohn
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+env:
+  secret:
+    - RAILS_MASTER_KEY
+    - POSTGRES_PASSWORD
+    - LOOKR_API_URL
+    - INTERNAL_KABOB_PLATFORM_URL
+    - APPIER_DSP_ENDPOINT
+    - APPIER_API_KEY
+    - TTD_DSP_ENDPOINT
+    - TTD_API_KEY
+    - LOOKR_API_URL
+    - CONNECTOR_API_URL
+    - REDIS_URL
+  clear:
+    SOLID_QUEUE_IN_PUMA: true
+aliases:
+  console: app exec --interactive --reuse "bin/rails console"
+  shell: app exec --interactive --reuse "bash"
+  logs: app logs -f
+  dbc: app exec --interactive --reuse "bin/rails dbconsole"
+
+volumes:
+  - "conector_storage:/rails/storage"
+
+builder:
+  arch: amd64
+accessories:
+  db:
+    image: postgres:16
+    host: 34.80.69.176
+    env:
+      clear:
+        POSTGRES_USER: 'kk1234'
+        POSTGRES_DB: 'conector_production'
+      secret:
+        - POSTGRES_PASSWORD
+    directories:
+      - data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7.0
+    host: 34.80.69.176
+    directories:
+      - data:/data
+deploy_timeout: 20

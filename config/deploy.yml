@@ -1,0 +1,11 @@
+service: conector-api
+
+image: wchampionjohn/conector-api-web
+registry:
+  server: ghcr.io
+  username: wchampionjohn
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+env:
+  secret:
+    - RAILS_MASTER_KEY
