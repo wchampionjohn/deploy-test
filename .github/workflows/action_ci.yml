@@ -1,0 +1,87 @@
+# https://docs.github.com/en/actions
+
+name: github-actions-cashare
+
+on:
+  pull_request:
+    branches: ['*']
+env:
+  RAILS_ENV: test
+jobs:
+  bundle_cache:
+    name: Bundle Cache
+    runs-on: ubuntu-18.04
+    outputs:
+      ruby_changed: ${{ steps.check-changed.outputs.ruby_changed }}
+    steps:
+      - run: | # gem "curb" require lib
+          sudo apt-get update
+          sudo apt-get install libcurl4 libcurl4-openssl-dev
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: check file changed
+        id: check-changed
+        run: |
+          if [[ -n $(git diff-tree --name-only -r $GITHUB_SHA ${{ github.event.pull_request.base.sha }} "*\.rb") ]]; then
+            echo ::set-output name=ruby_changed::true
+          fi
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3.6
+          bundler: default
+          bundler-cache: true
+      - run: bundle install --retry 3
+      - name: Print Information
+        run: |
+          echo "Ruby Version: `ruby -v`"
+          echo `bundle -v`
+  job_1:
+    name: Rails Rspec
+    runs-on: ubuntu-18.04
+    needs: bundle_cache
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v2
+      - uses: mirromutth/mysql-action@v1.1
+        # https://github.com/mirromutth/mysql-action
+        with:
+          mysql version: '5.7'
+          mysql root password: password
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7.2
+          bundler: default
+          bundler-cache: true
+      - name: Before Run
+        run: |
+          echo "Mysql Version: `mysql --version`"
+          cp config/{application.yml.sample,application.yml}
+          cp config/{database.yml.sample,database.yml}
+          cp config/{schedule.yml.sample,schedule.yml}
+          bundle exec rake db:prepare
+          bundle exec rake onetime:recreate_ngram_product_index
+      - run: bundle exec rspec
+  job_2:
+      name: Rails Code Quality
+      runs-on: ubuntu-18.04
+      needs: bundle_cache
+      if: ${{ needs.bundle_cache.outputs.ruby_changed == 'true' }}
+      steps:
+        - uses: actions/checkout@v2
+        - uses: ruby/setup-ruby@v1
+          with:
+            ruby-version: 2.7.2
+            bundler: default
+            bundler-cache: true
+        - run: bundle exec rubocop
+        - run: bundle exec brakeman

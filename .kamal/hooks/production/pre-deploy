@@ -1,0 +1,25 @@
+# #!/bin/bash
+
+# These environment variables are available:
+# KAMAL_RECORDED_AT
+# KAMAL_PERFORMER
+# KAMAL_VERSION
+# KAMAL_HOSTS
+# KAMAL_COMMAND
+# KAMAL_SUBCOMMAND
+# KAMAL_ROLE (if set)
+# KAMAL_DESTINATION (if set)
+
+OUTPUT=$(kamal server -d production exec -- docker ps --format '{{.ID}}\ {{.Names}}' | grep conector-api-web-production)
+CONTAINER_ID=$(echo "$OUTPUT" | awk '{print $1}')
+CONTAINER_NAME=$(echo "$OUTPUT" | awk '{print $2}')
+
+echo "Container ID: $CONTAINER_ID" >> /tmp/kamal-pre-deploy.log
+echo "Container Name: $CONTAINER_NAME" >> /tmp/kamal-pre-deploy.log
+
+if [ -n "$CONTAINER_ID" ]; then
+    kamal server -d production exec -q docker stop "$CONTAINER_ID"
+    kamal server -d production exec -q docker rm "$CONTAINER_ID"
+else
+    echo "No matching container found, skipping rename." >> /tmp/kamal-post-deploy.log
+fi

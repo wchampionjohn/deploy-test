@@ -70,3 +70,4 @@ ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 # Start server via Thruster by default, this can be overwritten at runtime
 CMD ["bundle", "exec", "puma", "-b", "tcp://0.0.0.0:3000"]
 EXPOSE 3000
+
