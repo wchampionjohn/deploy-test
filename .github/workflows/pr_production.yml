@@ -15,7 +15,7 @@ jobs:
           git fetch origin staging:staging
           git reset --hard staging
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@v7
         with:
           branch: staging
           title: Deploy to Production
