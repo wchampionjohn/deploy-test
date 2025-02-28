@@ -34,11 +34,11 @@ jobs:
       - name: Decode SSH Key
         run: |
           echo "$SSH_PRIVATE_KEY"
+          echo "$TEST"
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           eval $(ssh-agent -s)
-          ssh-add ~/.ssh/id_rsa
           # Configure SSH ProxyCommand in .ssh/config
           echo -e "Host bastion\n  Hostname 18.179.12.69\n  User ec2-user\n  Port 22345\n" > ~/.ssh/config
           echo -e "Host staging_io\n  Hostname 172.31.45.33\n  User ec2-user\n  Port 22\n  ProxyCommand ssh -q -W %h:%p bastion" >> ~/.ssh/config
@@ -49,6 +49,7 @@ jobs:
           ssh -T -o StrictHostKeyChecking=no ec2-user@172.31.45.33
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          TEST: ${{ secrets.TEST }}
 
       - name: Deploy with Kamal
         run: bin/kamal deploy -d staging
