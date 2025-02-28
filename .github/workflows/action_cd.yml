@@ -30,6 +30,7 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
       - name: Decode SSH Key
         run: |
           echo "$SSH_PRIVATE_KEY"
@@ -47,20 +48,23 @@ jobs:
           echo "SSH key decoded"
           ssh -T -o StrictHostKeyChecking=no ec2-user@172.31.45.33
         env:
-         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
       - name: Deploy with Kamal
         run: bin/kamal deploy -d staging
         env:
           KAMAL_REGISTRY_PASSWORD: ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
-  post:
-    - name: Check SSH status on failure
-      run: |
-        if [ $? -ne 0 ]; then
-          echo "Job failed, running SSH check"
-          ssh-add -l
-          # Optionally, do other troubleshooting tasks
-          cat ~/.ssh/id_rsa | head -n 10  # Show first 10 lines for debugging
-          ssh -o StrictHostKeyChecking=no -J ec2-user@18.179.12.69:22345 ec2-user@172.31.45.33 -p 22
-        fi  
+
+      # Debugging step if deployment fails
+      - name: Check SSH status on failure
+        run: |
+          if [ $? -ne 0 ]; then
+            echo "Job failed, running SSH check"
+            ssh-add -l  # List loaded SSH keys
+            # Optionally, show part of the SSH private key for debugging
+            cat ~/.ssh/id_rsa | head -n 10
+            ssh -T -o StrictHostKeyChecking=no -J ec2-user@18.179.12.69:22345 ec2-user@172.31.45.33 -p 22
+          fi
+        if: failure()  # Ensure this step only runs if a previous step failed
