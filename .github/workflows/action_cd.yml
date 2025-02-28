@@ -45,6 +45,7 @@ jobs:
           # Configure SSH ProxyCommand in .ssh/config
           echo -e "Host bastion\n  Hostname 18.179.12.69\n  User ec2-user\n  Port 22345\n" > ~/.ssh/config
           echo -e "Host staging_io\n  Hostname 172.31.45.33\n  User ec2-user\n  Port 22\n  ProxyCommand ssh -q -W %h:%p bastion" >> ~/.ssh/config
+          echo "okay"
           # Make sure known hosts file is updated
           ssh-keyscan 18.179.12.69 >> ~/.ssh/known_hosts
           ssh-keyscan 172.31.45.33 >> ~/.ssh/known_hosts
