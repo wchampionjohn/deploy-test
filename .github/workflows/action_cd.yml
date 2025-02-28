@@ -54,4 +54,14 @@ jobs:
           KAMAL_REGISTRY_PASSWORD: ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+post:
+  - name: Check SSH status on failure
+    run: |
+      if [ $? -ne 0 ]; then
+        echo "Job failed, running SSH check"
+        ssh-add -l
+        # Optionally, do other troubleshooting tasks
+        cat ~/.ssh/id_rsa | head -n 10  # Show first 10 lines for debugging
+        ssh -o StrictHostKeyChecking=no -J ec2-user@18.179.12.69:22345 ec2-user@172.31.45.33 -p 22
+      fi  
 
