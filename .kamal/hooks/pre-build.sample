@@ -48,4 +48,5 @@ if [ "$KAMAL_VERSION" != "$remote_head" ]; then
   exit 1
 fi
 
+
 exit 0
