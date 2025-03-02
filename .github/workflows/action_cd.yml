@@ -58,6 +58,8 @@ jobs:
           chmod 600 ~/.ssh/config
           ssh-keyscan -H 18.179.12.69 >> ~/.ssh/known_hosts
           ssh-keyscan -H 172.31.45.33 >> ~/.ssh/known_hosts
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: Test SSH Proxy to Staging
         run: |
           echo "Testing SSH connection to bastion..."
@@ -65,8 +67,6 @@ jobs:
       
           echo "Testing SSH connection to staging_io through bastion..."
           ssh -o StrictHostKeyChecking=no -J ec2-user@18.179.12.69:22345 ec2-user@172.31.45.33 -p 22 echo "Connected to staging_io"
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Deploy with Kamal
         run: bin/kamal deploy -d staging
