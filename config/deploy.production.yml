@@ -7,12 +7,12 @@ ssh:
 servers:
   job:
     hosts:
-      - 34.80.69.176
+      - production.ip
     cmd: bundle exec sidekiq -q default -q low -q critical -q unsafe
     proxy: false
   web:
     hosts:
-      - 34.80.69.176
+      - production.ip
     proxy: false
     options:
       publish: "80:3000"
@@ -51,7 +51,7 @@ builder:
 accessories:
   db:
     image: postgres:16
-    host: 34.80.69.176
+    host: production.ip
     env:
       clear:
         POSTGRES_USER: 'kk1234'
@@ -63,7 +63,7 @@ accessories:
 
   redis:
     image: redis:7.0
-    host: 34.80.69.176
+    host: production.ip
     directories:
       - data:/data
 deploy_timeout: 20
