@@ -65,11 +65,6 @@ jobs:
           --health-retries 5
     steps:
       - uses: actions/checkout@v2
-      - uses: mirromutth/mysql-action@v1.1
-        # https://github.com/mirromutth/mysql-action
-        with:
-          mysql version: '5.7'
-          mysql root password: password
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.3.6
@@ -78,7 +73,7 @@ jobs:
       - name: Before Run
         run: |
           echo "PostgreSQL Version: `psql --version`"
-          cp config/{database.yml.sample,database.yml}
+          cp config/{database.yml.example,database.yml}
           bundle exec rake db:prepare
       - run: bundle exec rspec
   job_2:
