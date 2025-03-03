@@ -38,7 +38,7 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           eval $(ssh-agent -s)
           ssh-add ~/.ssh/id_rsa
-          # 設定 SSH 代理
+          # setting up ssh config
           cat <<EOT >> ~/.ssh/config
           Host bastion
             Hostname 18.179.12.69
@@ -54,19 +54,11 @@ jobs:
             ProxyCommand ssh -q -W %h:%p bastion
             IdentityFile ~/.ssh/id_rsa
           EOT
-          echo 'done'
 
-          chmod 600 ~/.ssh/config
+          ssh-keyscan -H bastion >> ~/.ssh/known_hosts
+          ssh-keyscan -H staging_io >> ~/.ssh/known_hosts
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: Test SSH Proxy to Staging
-        run: |
-          echo "Testing SSH connection to bastion..."
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@18.179.12.69 -p 22345 echo "Connected to bastion"
-      
-          echo "Testing SSH connection to staging_io through bastion..."
-          ssh -o StrictHostKeyChecking=no -J ec2-user@18.179.12.69:22345 ec2-user@172.31.45.33 -p 22 echo "Connected to staging_io"
-
       - name: Deploy with Kamal
         run: bin/kamal deploy -d staging
         env:
@@ -74,14 +66,3 @@ jobs:
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
 
-      # Debugging step if deployment fails
-      - name: Check SSH status on failure
-        run: |
-          if [ $? -ne 0 ]; then
-            echo "Job failed, running SSH check"
-            ssh-add -l  # List loaded SSH keys
-            # Optionally, show part of the SSH private key for debugging
-            cat ~/.ssh/id_rsa | head -n 10
-            ssh -T -o StrictHostKeyChecking=no -J ec2-user@18.179.12.69:22345 ec2-user@172.31.45.33 -p 22
-          fi
-        if: failure()  # Ensure this step only runs if a previous step failed
