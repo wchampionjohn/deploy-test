@@ -1,6 +1,6 @@
 # https://docs.github.com/en/actions
 
-name: github-actions-cashare
+name: github-actions-conector-api
 
 on:
   pull_request:
@@ -10,7 +10,7 @@ env:
 jobs:
   bundle_cache:
     name: Bundle Cache
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     outputs:
       ruby_changed: ${{ steps.check-changed.outputs.ruby_changed }}
     steps:
@@ -38,7 +38,7 @@ jobs:
           echo `bundle -v`
   job_1:
     name: Rails Rspec
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     needs: bundle_cache
     services:
       redis:
@@ -83,7 +83,7 @@ jobs:
       - run: bundle exec rspec
   job_2:
       name: Rails Code Quality
-      runs-on: ubuntu-18.04
+      runs-on: ubuntu-22.04
       needs: bundle_cache
       if: ${{ needs.bundle_cache.outputs.ruby_changed == 'true' }}
       steps:
