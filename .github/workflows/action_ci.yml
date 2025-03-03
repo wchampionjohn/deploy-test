@@ -8,7 +8,7 @@ on:
 env:
   RAILS_ENV: test
 jobs:
-  mainmainbundle_cache:
+  bundle_cache:
     name: Bundle Cache
     runs-on: ubuntu-18.04
     outputs:
