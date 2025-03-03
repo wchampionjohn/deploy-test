@@ -1,6 +1,6 @@
 # https://docs.github.com/en/actions
 
-name: github-actions-cashare
+name: github-actions-conector-api
 
 on:
   pull_request:
@@ -8,9 +8,9 @@ on:
 env:
   RAILS_ENV: test
 jobs:
-  mainmainbundle_cache:
+  bundle_cache:
     name: Bundle Cache
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     outputs:
       ruby_changed: ${{ steps.check-changed.outputs.ruby_changed }}
     steps:
@@ -38,8 +38,12 @@ jobs:
           echo `bundle -v`
   job_1:
     name: Rails Rspec
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     needs: bundle_cache
+    env:
+      POSTGRES_USER: runner
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: test_db
     services:
       redis:
         image: redis
@@ -65,11 +69,6 @@ jobs:
           --health-retries 5
     steps:
       - uses: actions/checkout@v2
-      - uses: mirromutth/mysql-action@v1.1
-        # https://github.com/mirromutth/mysql-action
-        with:
-          mysql version: '5.7'
-          mysql root password: password
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.3.6
@@ -78,12 +77,12 @@ jobs:
       - name: Before Run
         run: |
           echo "PostgreSQL Version: `psql --version`"
-          cp config/{database.yml.sample,database.yml}
+          cp config/{database.yml.example,database.yml}
           bundle exec rake db:prepare
       - run: bundle exec rspec
   job_2:
       name: Rails Code Quality
-      runs-on: ubuntu-18.04
+      runs-on: ubuntu-22.04
       needs: bundle_cache
       if: ${{ needs.bundle_cache.outputs.ruby_changed == 'true' }}
       steps:

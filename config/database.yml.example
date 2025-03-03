@@ -3,6 +3,17 @@ default: &default
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 
+test:
+  adapter: postgresql
+  encoding: unicode
+  database: <%= ENV.fetch("POSTGRES_DB", "test_db") %>
+  username: <%= ENV.fetch("POSTGRES_USER", "runner") %>
+  password: <%= ENV.fetch("POSTGRES_PASSWORD", "password") %>
+  host: localhost
+  port: 5432
+  pool: 5
+
+
 production:
   primary:
     database: conector_production
