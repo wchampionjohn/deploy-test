@@ -8,7 +8,7 @@ on:
 env:
   RAILS_ENV: test
 jobs:
-  bundle_cache:
+  mainmainbundle_cache:
     name: Bundle Cache
     runs-on: ubuntu-18.04
     outputs:
@@ -50,6 +50,19 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: runner
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U runner"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v2
       - uses: mirromutth/mysql-action@v1.1
@@ -59,17 +72,14 @@ jobs:
           mysql root password: password
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.7.2
+          ruby-version: 3.3.6
           bundler: default
           bundler-cache: true
       - name: Before Run
         run: |
-          echo "Mysql Version: `mysql --version`"
-          cp config/{application.yml.sample,application.yml}
+          echo "PostgreSQL Version: `psql --version`"
           cp config/{database.yml.sample,database.yml}
-          cp config/{schedule.yml.sample,schedule.yml}
           bundle exec rake db:prepare
-          bundle exec rake onetime:recreate_ngram_product_index
       - run: bundle exec rspec
   job_2:
       name: Rails Code Quality
@@ -80,7 +90,7 @@ jobs:
         - uses: actions/checkout@v2
         - uses: ruby/setup-ruby@v1
           with:
-            ruby-version: 2.7.2
+            ruby-version: 3.3.6
             bundler: default
             bundler-cache: true
         - run: bundle exec rubocop
