@@ -63,7 +63,7 @@ group :development do
   gem "web-console"
 
   gem "annotaterb", "4.13.0"
-  gem "rubocop", "1.68.0"
+  gem "rubocop", "1.73.2"
 end
 
 group :test do
